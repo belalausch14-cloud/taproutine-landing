@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TapRoutine — Track Habits Without Touching Your Phone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script async src="https://tally.so/widgets/embed.js"></script>
+<style>
+  :root {
+    --orange: #f59e0b;
+    --orange-dark: #d97706;
+    --orange-light: #fef3e2;
+    --orange-soft: #fff7ed;
+    --text: #111827;
+    --text-muted: #4b5563;
+    --text-light: #6b7280;
+    --bg: #ffffff;
+    --bg-card: #f3f4f6;
+    --border: #e5e7eb;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-orange: 0 8px 24px rgba(245, 158, 11, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--orange); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--orange); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--orange);
+    color: white;
+    box-shadow: var(--shadow-orange);
+  }
+  .btn-primary:hover {
+    background: var(--orange-dark);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: white;
+    color: var(--text);
+    border: 1.5px solid var(--orange-light);
+  }
+  .btn-secondary:hover { border-color: var(--orange); }
+
+  /* Container */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 80px 32px 60px;
+    text-align: center;
+    background: radial-gradient(ellipse at top, var(--orange-soft) 0%, transparent 60%);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: var(--orange-light);
+    color: var(--orange-dark);
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .badge::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  h1 {
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1 .accent { color: var(--orange); }
+
+  .hero p {
+    font-size: 19px;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 auto 40px;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 64px;
+  }
+
+  .hero-image {
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Sections */
+  section {
+    padding: 100px 32px;
+  }
+
+  .section-label {
+    color: var(--orange);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: clamp(32px, 4.5vw, 52px);
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h2 .accent { color: var(--orange); }
+
+  .section-sub {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 18px;
+    max-width: 640px;
+    margin: 0 auto 64px;
+  }
+
+  /* Problem cards */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .problem-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 36px 28px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .problem-card:hover { transform: translateY(-4px); }
+
+  .icon-box {
+    width: 56px;
+    height: 56px;
+    background: var(--orange-light);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--orange);
+  }
+  .problem-card h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .problem-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* Solution */
+  .solution-section {
+    display: block;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .solution-text {
+    max-width: 700px;
+    margin: 0 auto 48px;
+  }
+  .solution-text .checklist {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .solution-section .section-label,
+  .solution-section h2,
+  .solution-section .section-sub {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .solution-section h2 { max-width: 800px; }
+  .solution-section .section-sub { margin-bottom: 32px; }
+
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .checklist li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .check {
+    width: 28px;
+    height: 28px;
+    background: var(--orange-light);
+    color: var(--orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .solution-image {
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    max-width: 900px;
+    margin: 0 auto;
+    aspect-ratio: 16/10;
+  }
+  .solution-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* How it Works */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .step {
+    text-align: center;
+    position: relative;
+  }
+  .step-num {
+    font-size: 80px;
+    font-weight: 800;
+    color: var(--orange-light);
+    line-height: 1;
+    margin-bottom: -20px;
+    letter-spacing: -2px;
+  }
+  .step .icon-box {
+    position: relative;
+    z-index: 1;
+    width: 64px;
+    height: 64px;
+  }
+  .step h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .step p {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  /* Features */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 32px;
+    transition: transform 0.2s;
+  }
+  .feature-card:hover { transform: translateY(-4px); }
+  .feature-card .icon-box {
+    margin: 0 0 24px 0;
+  }
+  .feature-card h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .feature-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* Dashboard */
+  .dashboard-section {
+    background: linear-gradient(180deg, transparent 0%, var(--orange-soft) 100%);
+  }
+  .dashboard-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .dashboard-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Early Access */
+  .early-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .early-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 36px 28px;
+    text-align: center;
+  }
+  .early-card .icon-box { margin: 0 auto 20px; }
+  .early-card h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .early-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* Waitlist Form */
+  .waitlist-section {
+    padding: 60px 32px 100px;
+  }
+  .waitlist-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 56px 48px;
+    border: 1px solid var(--border);
+  }
+  .waitlist-card .section-label { margin-bottom: 12px; }
+  .waitlist-card h2 {
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+  .waitlist-card .section-sub {
+    margin-bottom: 32px;
+    font-size: 16px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 16px 18px;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--orange);
+  }
+
+  .btn-full {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    justify-content: center;
+  }
+
+  .form-note {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  .success-msg {
+    text-align: center;
+    padding: 32px 0;
+    color: var(--orange-dark);
+    font-weight: 600;
+    font-size: 18px;
+    display: none;
+  }
+  .success-msg.show { display: block; }
+
+  /* FAQ */
+  .faq {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .faq-item {
+    background: var(--bg-card);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+  .faq-question {
+    width: 100%;
+    padding: 22px 28px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+  }
+  .faq-question::after {
+    content: '⌄';
+    font-size: 20px;
+    color: var(--text-muted);
+    transition: transform 0.3s;
+  }
+  .faq-item.open .faq-question::after { transform: rotate(180deg); }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 28px;
+    color: var(--text-muted);
+  }
+  .faq-item.open .faq-answer {
+    max-height: 200px;
+    padding: 0 28px 22px;
+  }
+
+  /* Footer */
+  footer {
+    background: #0f1419;
+    color: #9ca3af;
+    padding: 48px 32px;
+    text-align: center;
+  }
+  footer .logo { color: white; margin-bottom: 12px; }
+  footer p { font-size: 14px; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    .container, section, .hero { padding-left: 20px; padding-right: 20px; }
+    .hero { padding-top: 60px; padding-bottom: 40px; }
+    section { padding-top: 70px; padding-bottom: 70px; }
+    .solution-text { margin-bottom: 32px; }
+    .waitlist-card { padding: 36px 24px; }
+    .waitlist-card h2 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="logo">Tap<span>Routine</span></div>
+    <ul class="nav-links">
+      <li><a href="#how">How it Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a href="#waitlist" data-tally-open="b5KvKo" data-tally-layout="modal" data-tally-emoji-text="👋" data-tally-emoji-animation="wave" class="btn btn-primary">Join Waitlist</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">Coming Soon — Join the Waitlist</div>
+  <h1>Track Habits Without<br><span class="accent">Touching Your Phone</span></h1>
+  <p>A physical habit tracker that logs your progress with a single press. No apps. No distractions. Just track and move on.</p>
+  <div class="hero-buttons">
+    <a href="#waitlist" data-tally-open="b5KvKo" data-tally-layout="modal" data-tally-emoji-text="👋" data-tally-emoji-animation="wave" class="btn btn-primary">Join the Waitlist →</a>
+    <a href="#how" class="btn btn-secondary">See How It Works</a>
+  </div>
+  <div class="hero-image">
+    <img src="images/hero.png" alt="TapRoutine - Hand presses the device">
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="section-label">The Problem</div>
+  <h2>Your Phone Is a <span class="accent">Habit-Tracking Trap</span></h2>
+  <p class="section-sub">You open your phone to check off a habit — and 20 minutes later you're deep in social media. Sounds familiar?</p>
+
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </div>
+      <h3>Unlock. Open app. Get distracted.</h3>
+      <p>What was supposed to take 5 seconds turns into 20 minutes of scrolling.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+      </div>
+      <h3>Broken focus, broken streaks</h3>
+      <p>Every time you pick up your phone to log a habit, you risk losing your flow.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3>Friction kills consistency</h3>
+      <p>The harder it is to track, the less likely you are to stick with it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution" style="background: linear-gradient(180deg, var(--orange-soft) 0%, transparent 100%); padding-bottom: 40px;">
+  <div class="solution-section">
+    <div class="solution-text">
+      <div class="section-label">The Solution</div>
+      <h2>Meet <span class="accent">TapRoutine</span></h2>
+      <p class="section-sub">A simple physical device that makes habit tracking frictionless. Press once to log. That's it. Your focus stays where it matters.</p>
+      <ul class="checklist">
+        <li><span class="check">✓</span> No unlocking your phone</li>
+        <li><span class="check">✓</span> No opening apps</li>
+        <li><span class="check">✓</span> No distraction loop</li>
+        <li><span class="check">✓</span> Just track and move on</li>
+      </ul>
+    </div>
+    <div class="solution-image">
+      <img src="images/device.png" alt="TapRoutine device">
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">How It Works</div>
+  <h2>Three Steps. <span class="accent">Zero Friction.</span></h2>
+  <p class="section-sub">TapRoutine is designed to be the simplest part of your routine.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="icon-box">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
+      </div>
+      <h3>Press to Log</h3>
+      <p>Complete a habit? Just press TapRoutine. One press, one log. Done.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="icon-box">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+      </div>
+      <h3>Different Taps, Different Habits</h3>
+      <p>Use different tap patterns to track multiple habits — workout, reading, water, meditation.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="icon-box">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <h3>View Your Progress</h3>
+      <p>Open the dashboard anytime to see streaks, charts, and progress over time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Features</div>
+  <h2>Built for <span class="accent">Focus & Discipline</span></h2>
+  <p class="section-sub">Everything you need to build better habits — nothing you don't.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <h3>Physical Tracking</h3>
+      <p>A real device on your desk. No screens needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="2" x2="22" y2="22"/><path d="M19.79 14.93A10 10 0 0 1 4.69 7.07"/><path d="M12 2L3 5v6c0 5 3.5 9 9 11"/></svg>
+      </div>
+      <h3>No Distractions</h3>
+      <p>Break the cycle. Log without opening your phone.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+      </div>
+      <h3>Fast & Simple</h3>
+      <p>One press takes less than a second. No friction.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      </div>
+      <h3>Multiple Habits</h3>
+      <p>Track different habits with different tap patterns.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <h3>Clean Dashboard</h3>
+      <p>View streaks, trends, and progress anytime.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.9h6.1l-4.95 3.6 1.9 5.9-4.95-3.6-4.95 3.6 1.9-5.9-4.95-3.6h6.1z"/></svg>
+      </div>
+      <h3>Satisfying to Use</h3>
+      <p>The tactile press makes tracking feel intentional.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="dashboard-section">
+  <div class="section-label">Dashboard</div>
+  <h2>See Your Progress. <span class="accent">Stay Motivated.</span></h2>
+  <p class="section-sub">All your habits, streaks, and stats in one beautiful dashboard — when you're ready to look.</p>
+
+  <div class="dashboard-card">
+    <img src="images/dashboard.png" alt="TapRoutine dashboard chart">
+  </div>
+</section>
+
+<!-- EARLY ACCESS -->
+<section>
+  <div class="section-label">Early Access</div>
+  <h2>Be Part of <span class="accent">Something New</span></h2>
+  <p class="section-sub">TapRoutine is in development. Join now and help shape the future of distraction-free habit tracking.</p>
+
+  <div class="early-grid">
+    <div class="early-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h3>Join Early Supporters</h3>
+      <p>Be among the first to get your hands on TapRoutine when it launches.</p>
+    </div>
+    <div class="early-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+      </div>
+      <h3>Help Shape the Product</h3>
+      <p>Your feedback as an early supporter directly influences the final product.</p>
+    </div>
+    <div class="early-card">
+      <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <h3>Built With Intention</h3>
+      <p>TapRoutine is designed by people who believe self-improvement shouldn't require a screen.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST FORM -->
+<section class="waitlist-section" id="waitlist">
+  <div class="waitlist-card">
+    <div class="section-label">Waitlist</div>
+    <h2>Get <span class="accent">Early Access</span></h2>
+    <p class="section-sub">Sign up for updates and be the first to try TapRoutine when it launches.</p>
+
+    <a href="#" data-tally-open="b5KvKo" data-tally-layout="modal" data-tally-emoji-text="👋" data-tally-emoji-animation="wave" class="btn btn-primary btn-full" style="text-decoration:none;">Join the Waitlist →</a>
+    <p class="form-note">No spam. Unsubscribe anytime. We respect your inbox.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-label">FAQ</div>
+  <h2>Frequently Asked <span class="accent">Questions</span></h2>
+  <p class="section-sub" style="margin-bottom: 48px;"></p>
+
+  <div class="faq">
+    <div class="faq-item">
+      <button class="faq-question">What is TapRoutine?</button>
+      <div class="faq-answer"><p>TapRoutine is a small physical device that lets you track your daily habits with a single press — no phone, no app, no distractions.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">How does it work?</button>
+      <div class="faq-answer"><p>You press the button to log a habit. Different tap patterns can represent different habits. Your data syncs to a clean dashboard you check whenever you want.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">When will it launch?</button>
+      <div class="faq-answer"><p>TapRoutine is currently in development. Join the waitlist to be the first to know when it launches and to get early-bird access.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Do I need an app?</button>
+      <div class="faq-answer"><p>The whole point of TapRoutine is to keep you off your phone. The dashboard is optional — check it only when you want to review progress.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">What can I track with it?</button>
+      <div class="faq-answer"><p>Anything you want — workouts, reading, meditation, water intake, screen-time goals, study sessions. Whatever habit matters to you.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="logo">Tap<span style="color:var(--orange);">Routine</span></div>
+  <p>© 2026 TapRoutine. Track habits without touching your phone.</p>
+</footer>
+
+<script>
+  // FAQ Toggle
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.parentElement.classList.toggle('open');
+    });
+  });
+</script>
+
+</body>
+</html>
